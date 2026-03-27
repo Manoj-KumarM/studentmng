@@ -14,7 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendance_sessions: {
+        Row: {
+          allowed_radius_meters: number
+          created_at: string
+          id: string
+          is_active: boolean
+          session_code: string
+          teacher_latitude: number
+          teacher_longitude: number
+        }
+        Insert: {
+          allowed_radius_meters?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          session_code: string
+          teacher_latitude: number
+          teacher_longitude: number
+        }
+        Update: {
+          allowed_radius_meters?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          session_code?: string
+          teacher_latitude?: number
+          teacher_longitude?: number
+        }
+        Relationships: []
+      }
+      attendance_submissions: {
+        Row: {
+          attendance_status: string
+          distance_meters: number
+          id: string
+          session_id: string
+          student_latitude: number
+          student_longitude: number
+          student_name: string
+          student_usn: string
+          submitted_at: string
+        }
+        Insert: {
+          attendance_status: string
+          distance_meters: number
+          id?: string
+          session_id: string
+          student_latitude: number
+          student_longitude: number
+          student_name: string
+          student_usn: string
+          submitted_at?: string
+        }
+        Update: {
+          attendance_status?: string
+          distance_meters?: number
+          id?: string
+          session_id?: string
+          student_latitude?: number
+          student_longitude?: number
+          student_name?: string
+          student_usn?: string
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_submissions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "attendance_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
