@@ -55,7 +55,7 @@ function SidebarNav({ menuItems, roleLabel, groupLabel }: Omit<DashboardLayoutPr
         )}
       </div>
       <SidebarContent>
-        <SidebarGroup defaultOpen>
+        <SidebarGroup>
           <SidebarGroupLabel>{groupLabel}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
