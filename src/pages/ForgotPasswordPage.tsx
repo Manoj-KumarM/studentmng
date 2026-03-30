@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { GraduationCap } from "lucide-react";
 
 const ForgotPasswordPage = () => {
   const [step, setStep] = useState<"email" | "code" | "done">("email");
@@ -9,120 +14,93 @@ const ForgotPasswordPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [debugCode, setDebugCode] = useState("");
   const navigate = useNavigate();
 
   const sendCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
-
+    setError(""); setLoading(true);
     const { data, error: fnError } = await supabase.functions.invoke("reset-password", {
       body: { action: "send_code", email },
     });
-
-    if (fnError || data?.error) {
-      setError(data?.error || "Failed to send code");
-    } else {
-      setMessage("Reset code sent to your email");
-      setDebugCode(data?.code || ""); // For prototype testing
-      setStep("code");
-    }
+    if (fnError || data?.error) { setError(data?.error || "Failed to send code"); }
+    else { setDebugCode(data?.code || ""); setStep("code"); }
     setLoading(false);
   };
 
   const resetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-    if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
-
+    if (newPassword !== confirmPassword) { setError("Passwords do not match"); return; }
+    if (newPassword.length < 6) { setError("Password must be at least 6 characters"); return; }
     setLoading(true);
     const { data, error: fnError } = await supabase.functions.invoke("reset-password", {
       body: { action: "verify_and_reset", email, code, new_password: newPassword },
     });
-
-    if (fnError || data?.error) {
-      setError(data?.error || "Failed to reset password");
-    } else {
-      setStep("done");
-    }
+    if (fnError || data?.error) { setError(data?.error || "Failed to reset password"); }
+    else { setStep("done"); }
     setLoading(false);
   };
 
   if (step === "done") {
     return (
-      <div style={{ maxWidth: 400, margin: "80px auto", padding: 20, fontFamily: "system-ui", textAlign: "center" }}>
-        <h2 style={{ fontSize: 22, marginBottom: 12 }}>Password Reset Successful</h2>
-        <p style={{ color: "#666", marginBottom: 20 }}>You can now login with your new password.</p>
-        <Link to="/login" style={{ color: "#1a73e8", textDecoration: "none", fontSize: 16 }}>Go to Login</Link>
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="p-8">
+            <div className="h-12 w-12 rounded-xl bg-green-100 flex items-center justify-center mx-auto mb-4">
+              <GraduationCap className="h-7 w-7 text-green-600" />
+            </div>
+            <h2 className="text-xl font-bold mb-2">Password Reset Successful</h2>
+            <p className="text-sm text-muted-foreground mb-4">You can now sign in with your new password.</p>
+            <Button onClick={() => navigate("/login")} className="w-full">Go to Login</Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: "80px auto", padding: 20, fontFamily: "system-ui" }}>
-      <h1 style={{ fontSize: 24, marginBottom: 8, textAlign: "center" }}>Forgot Password</h1>
-      <p style={{ color: "#666", marginBottom: 24, textAlign: "center" }}>
-        {step === "email" ? "Enter your email to receive a reset code" : "Enter the code and your new password"}
-      </p>
-
-      {step === "email" && (
-        <form onSubmit={sendCode}>
-          <div style={{ marginBottom: 12 }}>
-            <label style={{ display: "block", marginBottom: 4, fontWeight: 500 }}>Email</label>
-            <input value={email} onChange={e => setEmail(e.target.value)} type="email" required style={inputStyle} placeholder="your@email.com" />
-          </div>
-          {error && <p style={{ color: "red", marginBottom: 12 }}>{error}</p>}
-          <button type="submit" disabled={loading} style={{ ...btnStyle, width: "100%", background: "#1a73e8", color: "#fff", border: "none" }}>
-            {loading ? "Sending..." : "Send Reset Code"}
-          </button>
-        </form>
-      )}
-
-      {step === "code" && (
-        <form onSubmit={resetPassword}>
-          {debugCode && (
-            <div style={{ background: "#fff3cd", padding: 8, borderRadius: 6, marginBottom: 12, fontSize: 14 }}>
-              <strong>Prototype:</strong> Your code is <strong>{debugCode}</strong>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-3">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <GraduationCap className="h-7 w-7 text-primary" />
             </div>
+          </div>
+          <CardTitle className="text-xl">Forgot Password</CardTitle>
+          <CardDescription>{step === "email" ? "Enter your email to receive a reset code" : "Enter the code and your new password"}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {step === "email" && (
+            <form onSubmit={sendCode} className="space-y-4">
+              <div><Label>Email</Label><Input value={email} onChange={e => setEmail(e.target.value)} type="email" required placeholder="your@email.com" className="mt-1" /></div>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+              <Button type="submit" disabled={loading} className="w-full">{loading ? "Sending..." : "Send Reset Code"}</Button>
+            </form>
           )}
-          <div style={{ marginBottom: 12 }}>
-            <label style={{ display: "block", marginBottom: 4, fontWeight: 500 }}>Reset Code</label>
-            <input value={code} onChange={e => setCode(e.target.value)} required style={inputStyle} placeholder="6-digit code" />
+          {step === "code" && (
+            <form onSubmit={resetPassword} className="space-y-4">
+              {debugCode && (
+                <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-3 text-sm">
+                  <strong>Prototype:</strong> Your code is <strong>{debugCode}</strong>
+                </div>
+              )}
+              <div><Label>Reset Code</Label><Input value={code} onChange={e => setCode(e.target.value)} required placeholder="6-digit code" className="mt-1" /></div>
+              <div><Label>New Password</Label><Input value={newPassword} onChange={e => setNewPassword(e.target.value)} type="password" required placeholder="New password" className="mt-1" /></div>
+              <div><Label>Confirm Password</Label><Input value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} type="password" required placeholder="Confirm password" className="mt-1" /></div>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+              <Button type="submit" disabled={loading} className="w-full">{loading ? "Resetting..." : "Reset Password"}</Button>
+            </form>
+          )}
+          <div className="text-center mt-4">
+            <Link to="/login" className="text-sm text-primary hover:underline">Back to Login</Link>
           </div>
-          <div style={{ marginBottom: 12 }}>
-            <label style={{ display: "block", marginBottom: 4, fontWeight: 500 }}>New Password</label>
-            <input value={newPassword} onChange={e => setNewPassword(e.target.value)} type="password" required style={inputStyle} placeholder="New password" />
-          </div>
-          <div style={{ marginBottom: 12 }}>
-            <label style={{ display: "block", marginBottom: 4, fontWeight: 500 }}>Confirm Password</label>
-            <input value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} type="password" required style={inputStyle} placeholder="Confirm password" />
-          </div>
-          {error && <p style={{ color: "red", marginBottom: 12 }}>{error}</p>}
-          <button type="submit" disabled={loading} style={{ ...btnStyle, width: "100%", background: "#1a73e8", color: "#fff", border: "none" }}>
-            {loading ? "Resetting..." : "Reset Password"}
-          </button>
-        </form>
-      )}
-
-      <div style={{ textAlign: "center", marginTop: 16 }}>
-        <Link to="/login" style={{ color: "#1a73e8", textDecoration: "none" }}>Back to Login</Link>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
-
-const inputStyle: React.CSSProperties = { width: "100%", padding: 8, fontSize: 16, borderRadius: 6, border: "1px solid #ccc", boxSizing: "border-box" };
-const btnStyle: React.CSSProperties = { padding: "10px 20px", fontSize: 16, cursor: "pointer", borderRadius: 6, border: "1px solid #ccc", background: "#f5f5f5" };
 
 export default ForgotPasswordPage;
