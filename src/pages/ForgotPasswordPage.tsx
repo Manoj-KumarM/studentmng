@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Mail, KeyRound, CheckCircle2, ArrowLeft, ShieldCheck } from "lucide-react";
 
 const ForgotPasswordPage = () => {
   const [step, setStep] = useState<"email" | "code" | "done">("email");
@@ -43,62 +43,88 @@ const ForgotPasswordPage = () => {
     setLoading(false);
   };
 
-  if (step === "done") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md text-center">
-          <CardContent className="p-8">
-            <div className="h-12 w-12 rounded-xl bg-green-100 flex items-center justify-center mx-auto mb-4">
-              <GraduationCap className="h-7 w-7 text-green-600" />
-            </div>
-            <h2 className="text-xl font-bold mb-2">Password Reset Successful</h2>
-            <p className="text-sm text-muted-foreground mb-4">You can now sign in with your new password.</p>
-            <Button onClick={() => navigate("/login")} className="w-full">Go to Login</Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-3">
-            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-              <GraduationCap className="h-7 w-7 text-primary" />
-            </div>
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex h-14 w-14 rounded-2xl gradient-primary items-center justify-center shadow-lg mb-4">
+            {step === "done" ? <CheckCircle2 className="h-7 w-7 text-white" /> : <ShieldCheck className="h-7 w-7 text-white" />}
           </div>
-          <CardTitle className="text-xl">Forgot Password</CardTitle>
-          <CardDescription>{step === "email" ? "Enter your email to receive a reset code" : "Enter the code and your new password"}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {step === "email" && (
-            <form onSubmit={sendCode} className="space-y-4">
-              <div><Label>Email</Label><Input value={email} onChange={e => setEmail(e.target.value)} type="email" required placeholder="your@email.com" className="mt-1" /></div>
-              {error && <p className="text-sm text-destructive">{error}</p>}
-              <Button type="submit" disabled={loading} className="w-full">{loading ? "Sending..." : "Send Reset Code"}</Button>
-            </form>
-          )}
-          {step === "code" && (
-            <form onSubmit={resetPassword} className="space-y-4">
-              {debugCode && (
-                <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-3 text-sm">
-                  <strong>Prototype:</strong> Your code is <strong>{debugCode}</strong>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {step === "done" ? "Password Reset!" : step === "code" ? "Enter Reset Code" : "Forgot Password"}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {step === "done"
+              ? "Your password has been updated successfully"
+              : step === "code"
+              ? "Enter the code sent to your email"
+              : "We'll send a reset code to your email"}
+          </p>
+        </div>
+
+        <Card className="border-0 shadow-lg">
+          <CardContent className="p-6">
+            {step === "done" ? (
+              <div className="text-center py-4">
+                <div className="h-16 w-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle2 className="h-8 w-8 text-emerald-600" />
                 </div>
-              )}
-              <div><Label>Reset Code</Label><Input value={code} onChange={e => setCode(e.target.value)} required placeholder="6-digit code" className="mt-1" /></div>
-              <div><Label>New Password</Label><Input value={newPassword} onChange={e => setNewPassword(e.target.value)} type="password" required placeholder="New password" className="mt-1" /></div>
-              <div><Label>Confirm Password</Label><Input value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} type="password" required placeholder="Confirm password" className="mt-1" /></div>
-              {error && <p className="text-sm text-destructive">{error}</p>}
-              <Button type="submit" disabled={loading} className="w-full">{loading ? "Resetting..." : "Reset Password"}</Button>
-            </form>
-          )}
-          <div className="text-center mt-4">
-            <Link to="/login" className="text-sm text-primary hover:underline">Back to Login</Link>
-          </div>
-        </CardContent>
-      </Card>
+                <p className="text-sm text-muted-foreground mb-6">You can now sign in with your new password.</p>
+                <Button onClick={() => navigate("/login")} className="w-full h-11 font-semibold">
+                  Back to Sign In
+                </Button>
+              </div>
+            ) : step === "email" ? (
+              <form onSubmit={sendCode} className="space-y-5">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Email Address</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input value={email} onChange={e => setEmail(e.target.value)} type="email" required placeholder="you@college.edu" className="pl-10 h-11 bg-background" />
+                  </div>
+                </div>
+                {error && <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm px-4 py-2.5 rounded-lg">{error}</div>}
+                <Button type="submit" disabled={loading} className="w-full h-11 font-semibold">
+                  {loading ? "Sending..." : "Send Reset Code"}
+                </Button>
+              </form>
+            ) : (
+              <form onSubmit={resetPassword} className="space-y-5">
+                {debugCode && (
+                  <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-3 text-sm flex items-center gap-2">
+                    <KeyRound className="h-4 w-4 shrink-0" />
+                    <span><strong>Prototype:</strong> Your code is <strong className="font-mono">{debugCode}</strong></span>
+                  </div>
+                )}
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Reset Code</Label>
+                  <Input value={code} onChange={e => setCode(e.target.value)} required placeholder="6-digit code" className="h-11 bg-background text-center text-lg font-mono tracking-[0.5em]" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">New Password</Label>
+                  <Input value={newPassword} onChange={e => setNewPassword(e.target.value)} type="password" required placeholder="••••••••" className="h-11 bg-background" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Confirm Password</Label>
+                  <Input value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} type="password" required placeholder="••••••••" className="h-11 bg-background" />
+                </div>
+                {error && <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm px-4 py-2.5 rounded-lg">{error}</div>}
+                <Button type="submit" disabled={loading} className="w-full h-11 font-semibold">
+                  {loading ? "Resetting..." : "Reset Password"}
+                </Button>
+              </form>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="text-center mt-6">
+          <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1">
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to Sign In
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };
