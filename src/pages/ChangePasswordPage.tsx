@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { KeyRound } from "lucide-react";
+import { KeyRound, ArrowLeft, CheckCircle2, Lock } from "lucide-react";
 
 const ChangePasswordPage = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -42,30 +42,62 @@ const ChangePasswordPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-3">
-            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-              <KeyRound className="h-7 w-7 text-primary" />
-            </div>
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="inline-flex h-14 w-14 rounded-2xl gradient-primary items-center justify-center shadow-lg mb-4">
+            <KeyRound className="h-7 w-7 text-white" />
           </div>
-          <CardTitle className="text-xl">Change Password</CardTitle>
-          <CardDescription>Update your account password</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div><Label>Current Password</Label><Input value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} type="password" required className="mt-1" /></div>
-            <div><Label>New Password</Label><Input value={newPassword} onChange={e => setNewPassword(e.target.value)} type="password" required className="mt-1" /></div>
-            <div><Label>Confirm New Password</Label><Input value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} type="password" required className="mt-1" /></div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            {success && <p className="text-sm text-green-600">{success}</p>}
-            <Button type="submit" disabled={loading} className="w-full">{loading ? "Changing..." : "Change Password"}</Button>
-          </form>
-          <div className="text-center mt-4">
-            <Button variant="ghost" onClick={goBack} className="text-sm">← Back to Dashboard</Button>
-          </div>
-        </CardContent>
-      </Card>
+          <h1 className="text-2xl font-bold tracking-tight">Change Password</h1>
+          <p className="text-sm text-muted-foreground mt-1">Update your account password</p>
+        </div>
+
+        <Card className="border-0 shadow-lg">
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Current Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} type="password" required className="pl-10 h-11 bg-background" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">New Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input value={newPassword} onChange={e => setNewPassword(e.target.value)} type="password" required className="pl-10 h-11 bg-background" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Confirm New Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} type="password" required className="pl-10 h-11 bg-background" />
+                </div>
+              </div>
+
+              {error && <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm px-4 py-2.5 rounded-lg">{error}</div>}
+              {success && (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-4 py-2.5 rounded-lg flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" />
+                  {success}
+                </div>
+              )}
+
+              <Button type="submit" disabled={loading} className="w-full h-11 font-semibold">
+                {loading ? "Changing..." : "Update Password"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        <div className="text-center mt-6">
+          <button onClick={goBack} className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1">
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

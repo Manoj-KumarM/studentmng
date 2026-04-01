@@ -5,9 +5,8 @@ import { getStoredUser, getRoleData } from "@/lib/auth";
 import DashboardLayout from "@/components/DashboardLayout";
 import PageHeader from "@/components/PageHeader";
 import StatCard from "@/components/StatCard";
-import { LayoutDashboard, QrCode, PenLine, FileUp, FileText, Download, XCircle, KeyRound } from "lucide-react";
+import { LayoutDashboard, QrCode, PenLine, FileUp, FileText, Download, KeyRound, Radio, BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 const teacherMenuItems = [
   { title: "Dashboard", url: "/teacher-dashboard", icon: LayoutDashboard },
@@ -45,43 +44,60 @@ const TeacherDashboard = () => {
 
   if (!user) return null;
 
+  const quickActions = [
+    { title: "Take Attendance", desc: "Generate QR code", icon: QrCode, url: "/teacher/attendance", color: "bg-primary/10 text-primary" },
+    { title: "Upload Marks", desc: "Enter exam marks", icon: FileUp, url: "/teacher/upload-marks", color: "bg-emerald-50 text-emerald-600" },
+    { title: "Upload Notes", desc: "Share materials", icon: FileText, url: "/teacher/upload-notes", color: "bg-amber-50 text-amber-600" },
+    { title: "Download Attendance", desc: "Export CSV", icon: Download, url: "/teacher/download-attendance", color: "bg-sky-50 text-sky-600" },
+  ];
+
   return (
     <DashboardLayout menuItems={teacherMenuItems} roleLabel="Teacher" groupLabel="Teaching">
-      <PageHeader title="Teacher Dashboard" description={`Welcome back, ${user.name}`} />
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <StatCard title="My Subjects" value={subjects.length} icon={FileText} />
-        <StatCard title="Active Sessions" value={activeSessions} icon={QrCode} />
-        <StatCard title="Role" value="Teacher" icon={LayoutDashboard} />
+      <PageHeader title="Dashboard" description={`Welcome back, ${user.name}`} />
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <StatCard title="My Subjects" value={subjects.length} icon={BookOpen} color="primary" />
+        <StatCard title="Active Sessions" value={activeSessions} icon={Radio} color="warning" />
+        <StatCard title="Role" value="Teacher" icon={LayoutDashboard} color="info" />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/teacher/attendance")}>
-          <CardContent className="p-5 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center"><QrCode className="h-5 w-5 text-primary" /></div>
-            <div><p className="font-medium text-sm">Take Attendance</p><p className="text-xs text-muted-foreground">Generate QR code</p></div>
-          </CardContent>
-        </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/teacher/upload-marks")}>
-          <CardContent className="p-5 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center"><FileUp className="h-5 w-5 text-primary" /></div>
-            <div><p className="font-medium text-sm">Upload Marks</p><p className="text-xs text-muted-foreground">Enter exam marks</p></div>
-          </CardContent>
-        </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/teacher/upload-notes")}>
-          <CardContent className="p-5 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center"><FileText className="h-5 w-5 text-primary" /></div>
-            <div><p className="font-medium text-sm">Upload Notes</p><p className="text-xs text-muted-foreground">Share materials</p></div>
-          </CardContent>
-        </Card>
+
+      {/* Quick Actions */}
+      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Quick Actions</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {quickActions.map((action) => (
+          <Card
+            key={action.url}
+            className="border-0 shadow-sm card-hover cursor-pointer group"
+            onClick={() => navigate(action.url)}
+          >
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${action.color} group-hover:scale-105 transition-transform`}>
+                <action.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-medium text-sm">{action.title}</p>
+                <p className="text-xs text-muted-foreground">{action.desc}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
+
+      {/* My Subjects */}
       {subjects.length > 0 && (
-        <Card className="mt-6">
-          <CardHeader><CardTitle className="text-base">My Subjects</CardTitle></CardHeader>
+        <Card className="border-0 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-primary" />
+              My Subjects
+            </CardTitle>
+          </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {subjects.map(s => (
-                <div key={s.id} className="border rounded-lg p-3">
+                <div key={s.id} className="p-3 rounded-xl border border-border/60 bg-muted/30">
                   <p className="font-medium text-sm">{s.subject_name}</p>
-                  <p className="text-xs text-muted-foreground">{s.subject_code} · {s.branch} · Sem {s.semester} · Sec {s.section}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{s.subject_code} · {s.branch} · Sem {s.semester} · Sec {s.section}</p>
                 </div>
               ))}
             </div>
